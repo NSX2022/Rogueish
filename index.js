@@ -2,6 +2,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
 require('dotenv').config({ path: './config.env' });
+const { spawn, exec } = require('child_process');
 const { Client, Events, GatewayIntentBits, Activity, ActivityType, MessageFlags, Collection} = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
 
@@ -76,6 +77,14 @@ client.on(Events.InteractionCreate, async interaction => {
 // Log in to Discord with your client's token
 client.login(token).then(() => {
     client.user.setActivity(randomActivity, { type: ActivityType.Custom });
+});
+
+exec('node deploy-commands.js', (error, stdout, stderr) => {
+    if (error) {
+        console.error(`Error: ${error}`);
+        return;
+    }
+    console.log(`Output: ${stdout}`);
 });
 
 setInterval(() => {
