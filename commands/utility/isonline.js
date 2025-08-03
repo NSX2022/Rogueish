@@ -8,6 +8,6 @@ module.exports = {
         const ping = Date.now() - interaction.createdTimestamp;
         const wsping = interaction.client.ws.ping;
 
-        await interaction.reply(`Bot is online!\n**Response Time:** ${ping} ms \n**WebSocket Ping:** ${wsping} ms`);
+        await interaction.reply(`Bot is online\n**Response Time:** ${ping} ms \n**WebSocket Ping:** ${wsping} ms`);
     },
 };
