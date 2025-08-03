@@ -20,26 +20,36 @@ const client = new Client({
 
 client.commands = new Collection();
 
-//load commands
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+function recursiveLoading(dir) {
+    const items = fs.readdirSync(dir);
 
-for (const folder of commandFolders) {
-    const commandsPath = path.join(foldersPath, folder);
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-    for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, file);
-        const command = require(filePath);
-        // Set a new item in the Collection with the key as the command name and the value as the exported module
-        if ('data' in command && 'execute' in command) {
-            client.commands.set(command.data.name, command);
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+    for (const item of items) {
+        const fullPath = path.join(dir, item);
+        const stats = fs.statSync(fullPath);
+
+        if (stats.isDirectory()) {
+            // If it's a directory, recurse into it
+            recursiveLoading(fullPath);
+        } else if (item.endsWith('.js')) {
+            // If it's a .js file, try to load it as a command
+            try {
+                const command = require(fullPath);
+                if ('data' in command && 'execute' in command) {
+                    client.commands.set(command.data.name, command);
+                } else {
+                    console.log(`[WARNING] The command at ${fullPath} is missing a required "data" or "execute" property.`);
+                }
+            } catch (error) {
+                console.error(`Error loading ${fullPath}:`, error.message);
+            }
         }
     }
 }
 
+const commandsPath = path.join(__dirname, 'commands');
+recursiveLoading(commandsPath);
 
+console.log(`Loaded ${client.commands.size} commands`);
 
 // When the client is ready, run this code (only once).
 // The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
