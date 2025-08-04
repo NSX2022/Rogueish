@@ -5,9 +5,27 @@ module.exports = {
         .setName('online')
         .setDescription('Replies with bot\'s latency'),
     async execute(interaction) {
-        const ping = Date.now() - interaction.createdTimestamp;
-        const wsping = interaction.client.ws.ping;
+        const startTime = Date.now();
 
-        await interaction.reply(`Bot is online\n**Response Time:** ${ping} ms \n**WebSocket Ping:** ${wsping} ms`);
+        await interaction.reply('Pinging...');
+
+        const endTime = Date.now();
+        const processingTime = endTime - startTime;
+
+        const wsping = interaction.client.ws.ping;
+        let wspingText;
+
+        if (wsping === -1 || wsping === null || wsping === undefined) {
+            wspingText = 'Not available';
+        } else {
+            wspingText = `${wsping}ms`;
+        }
+
+        await interaction.editReply(
+            `Rogueish is online \n` +
+            `**Response Time:** ${processingTime}ms\n`/* +
+            `**WebSocket Ping:** ${wspingText} ms`
+            */
+        );
     },
 };
