@@ -5,6 +5,7 @@ require('dotenv').config({ path: './config.env' });
 const { spawn, exec } = require('child_process');
 const { Client, Events, GatewayIntentBits, Activity, ActivityType, MessageFlags, Collection} = require('discord.js');
 const token = process.env.DISCORD_TOKEN;
+const Sequelize = require('sequelize');
 
 console.log('Token loaded:', token ? 'Yes' : 'No');
 console.log('All env vars:', Object.keys(process.env));
@@ -105,5 +106,5 @@ exec('node deploy-commands.js', (error, stdout, stderr) => {
 
 setInterval(() => {
     let randomActivity = activities[Math.floor(Math.random() * activities.length)];
-    client.user.setActivity(randomActivity);
+    client.user.setActivity(randomActivity, { type: ActivityType.Custom });
 }, 600000);
